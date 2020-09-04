@@ -1,0 +1,51 @@
+service: sls-ws-boilerplate
+
+frameworkVersion: '>=1.28.0 <2.0.0'
+
+provider:
+  name: aws
+  runtime: go1.x
+  stage: dev
+  region: us-east-1
+  environment:
+      tableName: ${self:custom.tableName}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: '*'
+
+custom:
+  tableName: ws-conn
+
+
+package:
+  exclude:
+    - ./**
+  include:
+    - ./bin/**
+
+functions:
+  connectHandler:
+    handler: bin/websocket/connect
+    events:
+      - websocket: $connect
+  defaultHandler:
+    handler: bin/websocket/message
+    events:
+      - websocket: $default
+
+
+resources:
+    Resources:
+        WeboscketUserTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: ${self:custom.tableName}
+                AttributeDefinitions:
+                    - AttributeName: ConnectionID
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: ConnectionID
+                      KeyType: HASH
+                BillingMode: PAY_PER_REQUEST
