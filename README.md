@@ -22,7 +22,16 @@ the array with new messages.
 
 ## Deploy
 
-Just use `serverless depoy` 
+Compile first
+
+```bash
+make
+```
+
+And then just use serverles to deploy
+```bash
+serverless depoy
+``` 
 
 
 
